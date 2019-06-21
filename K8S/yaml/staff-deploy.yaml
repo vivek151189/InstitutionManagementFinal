@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staff-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staff
+  template:
+    metadata:
+      labels:
+        app: staff
+    spec:
+      containers:
+      - name: staffapi
+        image: vivek151189/staff:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__SqlConnection
+          value: "Data Source=mssql;Initial Catalog=StaffDB;Persist Security Info=True;User ID=sa;Password=Labuser@123456"
+       

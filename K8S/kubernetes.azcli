@@ -1,0 +1,90 @@
+#login to azure
+
+az login
+
+#Check the latest version of kubernetes available in Azure
+
+az aks get-versions -l "Southeastasia" --query "orchestrators[-1].orchestratorVersion" -o tsv
+
+#Create a new resource group 
+az group create -n "MyAksGroup" -l "Southeastasia"
+
+#Create the AKS Cluster
+az aks create -g "MyAksGroup" -l "Southeastasia" -n "vivekakscluster" --node-count 2 --node-vm-size Standard_D1 --enable-addons monitoring --kubernetes-version 1.13.5 --generate-ssh-key
+
+#Install kubectl
+az aks install-cli
+
+#Get the credential fro cluster to connect
+az aks get-credentials -g "MyAksGroup" -n "vivekakscluster" --overwrite-existing
+
+# view the clucter context config
+kubectl config view
+
+#view all nodes
+
+kubectl get nodes
+
+# view all service 
+kubectl get svc
+
+#view all pods
+kubectl get pods
+
+#create sql password
+kubectl create secret generic mssql --from-literal=SA_PASSWORD="Labuser@123456"
+
+
+#list the secret
+kubectl get secret
+
+#create the PVC for sql server
+kubectl apply -f "./yaml/sqlserver-pvc.yaml"
+
+#list the pvc 
+kubectl get pvc
+
+#delete service
+kubectl delete svc mssql
+
+#deploy service for sqlserver
+
+kubectl apply -f "./yaml/sqlserver-service.yaml"
+
+#Deploy SQL server
+kubectl apply -f "./yaml/sqlserver-deploy.yaml"
+
+#delete teh existing deployment
+kubectl delete deploy sqlserver
+
+#Replace the existing deployment
+kudectl replace -f "./yaml/sqlserver-deploy.yaml"
+
+
+#apply admin setting to prevent warnings
+kubectl apply -f "./yaml/dashboard-admin.yaml"
+
+#run the cluster
+
+az aks browse -g MyAksGroup -n vivekakscluster
+
+#deploy identitty
+kubectl replace -f "./yaml/identity-deploy.yaml"
+
+#deploy identity service
+kubectl apply -f "./yaml/identity-service.yaml"
+
+#deploy identitty
+kubectl apply -f "./yaml/event-deploy.yaml"
+
+#=========================
+# deploy staff deploy 
+kubectl apply -f "./yaml/staff-deploy.yaml"
+
+# deploy staff service
+kubectl apply -f "./yaml/staff-service.yaml"
+
+
+
+az aks browse -g MyAksGroup -n vivekakscluster
+
